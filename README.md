@@ -92,7 +92,9 @@ after that
 This function reads a file up to length number of bytes. Youare the one who gets to specify  the length so you don’t have to worry about running out of memory we read the large text file (1024*1024) 1MB at a time and it took some iterations to read the whole file. You can set the value of chunk_size to a reasonable value and read a very large file without exhausting your memory. You could use this technique to read a 1GB file using just 1MB of memory  in about 1024 iterations. You can also read even larger files and increase the chunk_size if you want to  keep the number of iterations low after reading the file, will the chunck size from log file 
       
 
+## Run the test cases ##
 
+1. Run **php bin/phpunit** to run the test unit test cases
 
 
 
