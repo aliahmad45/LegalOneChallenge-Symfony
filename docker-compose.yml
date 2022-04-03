@@ -1,0 +1,68 @@
+version: '3'
+networks:
+  symfony_project_2021_net:
+
+services:
+###> doctrine/doctrine-bundle ###
+  server:
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile
+    container_name: '${APP_NAME}-server'
+    ports:
+      - '${APP_PORT}:80'
+    working_dir: /var/www/html
+    environment:
+      - 'DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@127.0.0.1:3306/${DB}?serverVersion=5.7'
+    volumes:
+      - ./:/var/www/html
+      - ./docker/server/apache:/etc/apache2/sites-enabled
+      - ./docker/server/php/php.ini:/usr/local/etc/php/conf.d/extra-php-config.ini
+    depends_on:
+      db_server:
+        condition: service_healthy
+    networks:
+      - symfony_project_2021_net
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+  db_server:
+    image: mysql:5.7
+    container_name: '${APP_NAME}-db'
+    restart: always
+    ports:
+      - '${DB_PORT}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_USER: '${DB_USER}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: '${DB}'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/db/mysql.cnf:/etc/mysql/conf.d/my.cnf
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$DB_PASSWORD
+      interval: 5s
+      retries: 5
+    networks:
+      - symfony_project_2021_net
+
+  db_admin:
+    image: phpmyadmin/phpmyadmin:5
+    container_name: '${APP_NAME}-db-admin'
+    ports:
+      - '${APP_DB_ADMIN_PORT}:80'
+    environment:
+      PMA_HOST: db_server
+    depends_on:
+      db_server:
+        condition: service_healthy
+    volumes:
+      - db_admin_data:/var/www/html
+    networks:
+      - symfony_project_2021_net
+volumes:
+###> doctrine/doctrine-bundle ###
+  db-data:
+  db_admin_data:
+###< doctrine/doctrine-bundle ###
