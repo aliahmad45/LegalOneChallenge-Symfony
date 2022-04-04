@@ -1,6 +1,6 @@
 version: '3'
 networks:
-  symfony_project_2021_net:
+  symfony_project_2022_net:
 
 services:
 ###> doctrine/doctrine-bundle ###
@@ -45,7 +45,7 @@ services:
       interval: 5s
       retries: 5
     networks:
-      - symfony_project_2021_net
+      - symfony_project_2022_net
 
   db_admin:
     image: phpmyadmin/phpmyadmin:5
@@ -60,7 +60,7 @@ services:
     volumes:
       - db_admin_data:/var/www/html
     networks:
-      - symfony_project_2021_net
+      - symfony_project_2022_net
 volumes:
 ###> doctrine/doctrine-bundle ###
   db-data:
